@@ -124,12 +124,29 @@ Contributions welcome! Feel free to:
 
 MIT License - feel free to use for educational purposes
 
+## 🎉 New: Multi-PDF Support
+
+Upload and combine multiple PDFs into a single exam session!
+
+### Features:
+- **Upload Multiple PDFs**: Select multiple PDF files at once
+- **Question Bank**: Automatically merges questions from all PDFs
+- **Source Tracking**: Each question shows which PDF it came from
+- **Progress by PDF**: See your progress broken down by PDF source during the exam
+- **Performance Analytics**: View completion rates per PDF at the end
+
+### How to Use:
+1. Click "Choose PDF file(s)" and select multiple PDFs (hold Ctrl/Cmd to select multiple)
+2. All questions from selected PDFs will be combined into one exam
+3. During the exam, you'll see which PDF each question came from
+4. At the end, view your performance breakdown by PDF source
+
 ## 🚀 Future Enhancements
 
 1. **Image Support**: Extract and display images/diagrams from PDFs
 2. **Answer Validation**: Check answers against answer key
 3. **Statistics**: Track performance over time
-4. **Multiple PDFs**: Support for question banks
+4. **Multiple PDFs**: Support for question banks ✅ (IMPLEMENTED - See "Multi-PDF Support" section above)
 5. **Export**: Save results as PDF reports
 
 ---
