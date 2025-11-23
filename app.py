@@ -38,9 +38,9 @@ def extract_questions(pdf_file):
         # Enhanced patterns to match various question formats
         patterns = [
             # Q. 1, Q.1, Q1, Question 1, Q 1 with various separators
-            r'Q(?:uestion)?[.:]?\s*(\d+)[.:)\s]+(.+?)(?=Q(?:uestion)?[.:]?\s*\d+[.:)\s]|$)',
+                        r'Q(?:uestion)?[.:]?\s*(\d+)[.:)\s]+(.+?)(?=Q(?:uestion)?[.:]?\s*\d+[.:)\s]|$)',
             # 1. , 1) format
-            r'(\d+)[.:)']\s+(.+?)(?=\d+[.:)\s]|$)',
+                        r'(\d+)[.:)]\s+(.+?)(?=\d+[.:)\s]|$)',
         ]
         
         matches = []
