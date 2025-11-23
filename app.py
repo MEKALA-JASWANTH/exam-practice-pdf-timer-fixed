@@ -24,22 +24,10 @@ if 'exam_active' not in st.session_state:
 if 'exam_done' not in st.session_state:
     st.session_state.exam_done = False
 
-def clean_text(text):
-    """
-    Clean extracted text by removing PDF artifacts and unwanted content
-    """
-    # Remove common PDF artifacts
-    text = re.sub(r'SSC-CGL-Tier-1-Question-Paper.*?\.pdf', '', text, flags=re.IGNORECASE)
-    text = re.sub(r'Adda247.*?\n', '', text, flags=re.IGNORECASE)
-    text = re.sub(r'Page \d+', '', text)
-    text = re.sub(r'\d{2}-\d{2}-\d{4}', '', text)  # Remove dates
-    # Remove excessive whitespace
-    text = re.sub(r'\s+', ' ', text)
-    return text.strip()
-
 def extract_questions(pdf_file):
     """
-    Improved question extraction with better pattern matching and text cleaning
+    Enhanced question extraction with better pattern matching
+    to prevent missing questions like Q11
     """
     try:
         reader = PyPDF2.PdfReader(pdf_file)
@@ -47,84 +35,52 @@ def extract_questions(pdf_file):
         for page in reader.pages:
             text += page.extract_text() + "\n"
         
-        # Clean the text first
-        text = clean_text(text)
+        # Enhanced patterns to match various question formats
+        patterns = [
+            # Q. 1, Q.1, Q1, Question 1, Q 1 with various separators
+            r'Q(?:uestion)?[.:]?\s*(\d+)[.:)\s]+(.+?)(?=Q(?:uestion)?[.:]?\s*\d+[.:)\s]|$)',
+            # 1. , 1) format
+            r'(\d+)[.:]\s+(.+?)(?=\d+[.:]\s|$)',
+        ]
         
-        # Split by question markers more precisely
-        # This pattern looks for Q followed by optional dot/space and a number
-        question_pattern = r'Q\.?\s*(\d+)'
-        
-        # Find all question positions
-        question_matches = list(re.finditer(question_pattern, text, re.IGNORECASE))
-        
-        if not question_matches:
-            return []
+        matches = []
+        for pattern in patterns:
+            found = re.findall(pattern, text, re.DOTALL | re.IGNORECASE)
+            if len(found) > 0:
+                matches = found
+                break  # Use first successful pattern
         
         questions = []
-        
-        for i, match in enumerate(question_matches):
-            q_num = match.group(1)
-            start_pos = match.end()
+        for num, q_text in matches:
+            q_clean = q_text.strip()
+            # Enhanced option pattern to catch more formats
+            opt_pattern = r'([A-D])[.:\s)]\s*([^\n]+)'
+            options = re.findall(opt_pattern, q_clean)
             
-            # Find end position (start of next question or end of text)
-            if i + 1 < len(question_matches):
-                end_pos = question_matches[i + 1].start()
-            else:
-                end_pos = len(text)
-            
-            # Extract question text
-            q_text = text[start_pos:end_pos].strip()
-            
-            # Enhanced option pattern - more restrictive to avoid capturing junk
-            # Look for A, B, C, D followed by period/colon/parenthesis and text
-            # Stop at next option letter or certain keywords
-            opt_pattern = r'([A-D])[.:\s)]\s*([^\n]+?)(?=\s+[A-D][.:\s)]|Ans|Q\.|$)'
-            options = re.findall(opt_pattern, q_text, re.IGNORECASE)
-            
-            if options and len(options) >= 2:
+            if options:
                 # Clean question text by removing options
-                question_only = q_text
                 for letter, opt in options:
-                    # Remove the option line from question text
-                    question_only = re.sub(
-                        rf'{letter}[.:\s)]\s*{re.escape(opt)}',
-                        '',
-                        question_only,
-                        flags=re.IGNORECASE
-                    )
+                    # Remove PDF filename artifacts from options
+                    opt_cleaned = re.sub(r'SSC-CGL.*?\.pdf', '', opt, flags=re.IGNORECASE).strip()
+                    opt_cleaned = re.sub(r'Adda247', '', opt_cleaned, flags=re.IGNORECASE).strip()
+                    q_clean = q_clean.replace(f"{letter}){opt}", "").replace(f"{letter}.{opt}", "")
                 
-                # Further clean the question text
-                question_only = clean_text(question_only)
-                
-                # Remove "Ans" marker if present
-                question_only = re.sub(r'\s*Ans\s*$', '', question_only, flags=re.IGNORECASE)
-                
-                # Clean and limit option text
+                # Further clean the options dictionary
                 cleaned_options = {}
                 for letter, opt in options:
-                    # Clean option text
-                    opt_clean = clean_text(opt)
-                    # Limit option length (remove trailing junk)
-                    opt_clean = opt_clean[:200]  # Max 200 chars per option
-                    cleaned_options[letter.upper()] = opt_clean
+                    opt_cleaned = re.sub(r'SSC-CGL.*?\.pdf', '', opt, flags=re.IGNORECASE).strip()
+                    opt_cleaned = re.sub(r'Adda247', '', opt_cleaned, flags=re.IGNORECASE).strip()
+                    cleaned_options[letter] = opt_cleaned
                 
-                # Only add if we have valid question text and at least 2 options
-                if question_only and len(cleaned_options) >= 2:
-                    questions.append({
-                        'question': question_only,
-                        'options': cleaned_options
-                    })
+                questions.append({
+                    'question': q_clean.strip(), 
+                    'options': cleaned_options
+                })
             else:
-                # No clear options found - store with default options
-                question_only = clean_text(q_text)
-                if question_only:
-                    questions.append({
-                        'question': question_only,
-                        'options': {'A': 'Option A', 'B': 'Option B', 'C': 'Option C', 'D': 'Option D'}
-                    })
+                # No clear options found, store as single-option
+                questions.append({'question': q_clean, 'options': {'A': 'Option A', 'B': 'Option B', 'C': 'Option C', 'D': 'Option D'}})
         
         return questions
-    
     except Exception as e:
         st.error(f"Error extracting questions: {str(e)}")
         return []
