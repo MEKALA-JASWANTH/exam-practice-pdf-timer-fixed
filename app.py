@@ -54,7 +54,7 @@ def extract_questions(pdf_file):
         for num, q_text in matches:
             q_clean = q_text.strip()
             # Enhanced option pattern to catch more formats
-            opt_pattern = r'([A-D])[.:\s)]\s*([^\n]+)'
+            opt_pattern = r'\(?([A-Ea-e])[.\):]?\s*([^\n(]+?)(?=\s*\(?[A-Ea-e][.\):]|$)'
             options = re.findall(opt_pattern, q_clean)
             
             if options:
@@ -146,8 +146,9 @@ elif st.session_state.exam_active:
     
     # Answer selection
     selected = st.radio(
-        "Select your answer:",
+            "Select your answer:",
         list(current_question['options'].keys()),
+            index=None,
         format_func=lambda x: f"{x}. {current_question['options'][x]}",
         key=f"q_{st.session_state.current_idx}"
     )
