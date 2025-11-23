@@ -154,3 +154,49 @@ Upload and combine multiple PDFs into a single exam session!
 **Made with ❤️ for better exam preparation**
 
 Repository: [exam-practice-pdf-timer-fixed](https://github.com/MEKALA-JASWANTH/exam-practice-pdf-timer-fixed)
+
+---
+
+## 📝 Recent Updates
+
+**Version 2.0 - November 2025**
+- ✅ Fixed critical question extraction bug (Q11 issue resolved)
+- ✅ Added multi-PDF support for combining multiple exam papers
+- ✅ Enhanced regex patterns for better question detection
+- ✅ Improved UI/UX with better navigation
+- ✅ Added performance analytics by PDF source
+
+## 🎯 Use Cases
+
+- **Students**: Practice for competitive exams with timed sessions
+- **Teachers**: Create practice tests from multiple PDF sources
+- **Self-learners**: Track progress and identify weak areas
+- **Exam Prep**: Simulate real exam conditions with timer
+
+## 💡 Tips for Best Results
+
+1. Use clear, well-formatted PDF files for best question extraction
+2. Ensure questions follow standard numbering (1., Q1, Question 1, etc.)
+3. Keep PDFs focused on MCQ-type questions with A/B/C/D options
+4. Use the multi-PDF feature to create comprehensive practice sessions
+
+## 🔧 Troubleshooting
+
+**Questions not extracting properly?**
+- Check if your PDF has clear question numbering
+- Ensure options are labeled with A, B, C, D
+- Try using a different PDF format or re-export your PDF
+
+**Timer not working?**
+- Refresh the page
+- Clear browser cache
+- Ensure JavaScript is enabled
+
+## 📞 Contact & Support
+
+For issues, questions, or suggestions:
+- Open an issue on GitHub
+- Email: [Your contact email]
+- Pull requests are always welcome!
+
+
